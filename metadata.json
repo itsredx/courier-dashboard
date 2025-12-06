@@ -1,0 +1,5 @@
+{
+  "name": "LogiAdmin - Courier Dashboard",
+  "description": "A comprehensive admin dashboard for courier companies to manage deliveries, riders, finances, and settings.",
+  "requestFramePermissions": []
+}
