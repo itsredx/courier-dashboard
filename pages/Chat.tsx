@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Send, Search, MoreVertical, Phone, Paperclip, AlertCircle } from 'lucide-react';
 import { getConversations, getMessages, sendMessage as apiSendMessage } from '../services/api';
-import { Conversation, ChatMessage } from '../types';
+import { Conversation, ChatMessage, ChatParticipant } from '../types';
 
 const Chat = () => {
   const location = useLocation();
@@ -110,6 +110,13 @@ const Chat = () => {
     return conversation.participants.find(p => p.id !== currentUserId) || conversation.participants[0];
   };
 
+  const getDisplayName = (p: ChatParticipant) => {
+    if (p.first_name && p.last_name) {
+      return `${p.first_name} ${p.last_name}`;
+    }
+    return p.username;
+  };
+
   const activeConversation = conversations.find(c => c.id === activeConversationId);
   const activeParticipant = activeConversation ? getOtherParticipant(activeConversation) : null;
 
@@ -152,7 +159,7 @@ const Chat = () => {
                 >
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-700 font-bold text-sm border border-indigo-50">
-                      {participant.username.charAt(0)}
+                      {getDisplayName(participant).charAt(0)}
                     </div>
                     {conv.unread_count ? (
                       <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white"></span>
@@ -160,7 +167,7 @@ const Chat = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline mb-1">
-                      <h4 className={`font-semibold text-sm truncate ${isActive ? 'text-indigo-900' : 'text-gray-900'}`}>{participant.username}</h4>
+                      <h4 className={`font-semibold text-sm truncate ${isActive ? 'text-indigo-900' : 'text-gray-900'}`}>{getDisplayName(participant)}</h4>
                       <span className="text-xs text-gray-400 shrink-0">
                         {new Date(conv.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
@@ -189,10 +196,10 @@ const Chat = () => {
                 {activeParticipant && (
                   <>
                     <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
-                      {activeParticipant.username.charAt(0)}
+                      {getDisplayName(activeParticipant).charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-sm">{activeParticipant.username}</h3>
+                      <h3 className="font-bold text-gray-900 text-sm">{getDisplayName(activeParticipant)}</h3>
                       <span className="text-xs text-green-600 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                         Online
@@ -214,8 +221,8 @@ const Chat = () => {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm text-sm ${isMe
-                        ? 'bg-indigo-600 text-white rounded-tr-none'
-                        : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                      ? 'bg-indigo-600 text-white rounded-tr-none'
+                      : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
                       }`}>
                       <p>{msg.content}</p>
                       <div className={`text-[10px] mt-1 text-right ${isMe ? 'text-indigo-200' : 'text-gray-400'}`}>

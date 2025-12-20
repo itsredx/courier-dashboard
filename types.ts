@@ -7,9 +7,10 @@ export interface Customer {
 
 export interface Driver {
   id: number;
+  user?: number;
   name: string;
   phone?: string;
-  status: 'active' | 'suspended' | 'offline';
+  status: 'active' | 'suspended' | 'terminated';
   current_latitude?: number;
   current_longitude?: number;
   rating?: number;
@@ -96,7 +97,9 @@ export interface DistanceZone {
 
 export interface ChatParticipant {
   username: string;
-  id?: number; 
+  first_name?: string;
+  last_name?: string;
+  id?: number;
   avatar?: string;
   type?: 'rider' | 'customer' | 'admin';
 }

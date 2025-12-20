@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Phone, MapPin, MoreHorizontal, MessageSquare, AlertCircle } from 'lucide-react';
-import { getDrivers, inviteDriver as apiInviteDriver, startConversation as apiStartConversation } from '../services/api';
+import { getDrivers, inviteDriver as apiInviteDriver, startConversation as apiStartConversation, updateDriverStatus } from '../services/api';
 import { Driver } from '../types';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -47,8 +47,20 @@ const Riders = () => {
   const [error, setError] = useState<string | null>(null);
   const [inviting, setInviting] = useState(false);
   const [inviteData, setInviteData] = useState({ name: '', email: '', phone: '' });
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const activeRiders = riders.filter(r => r.status === 'active' && r.current_latitude && r.current_longitude);
+
+  const handleStatusUpdate = async (riderId: number, newStatus: 'active' | 'suspended' | 'terminated') => {
+    try {
+      await updateDriverStatus(riderId, newStatus);
+      setRiders(prev => prev.map(r => r.id === riderId ? { ...r, status: newStatus } : r));
+      setOpenMenuId(null);
+    } catch (err) {
+      console.error("Failed to update status", err);
+      alert('Failed to update status by API');
+    }
+  };
 
   useEffect(() => {
     loadRiders();
@@ -85,9 +97,9 @@ const Riders = () => {
     }
   };
 
-  const handleStartChat = async (riderId: number) => {
+  const handleStartChat = async (userId: number) => {
     try {
-      const conversation = await apiStartConversation(riderId);
+      const conversation = await apiStartConversation(userId);
       navigate('/chat', { state: { conversationId: (conversation as any).id } });
     } catch (err) {
       console.error("Failed to start chat", err);
@@ -181,18 +193,55 @@ const Riders = () => {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${rider.status === 'active' ? 'bg-green-100 text-green-700' :
-                    rider.status === 'suspended' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                    rider.status === 'suspended' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'
                     }`}>
                     {rider.status}
                   </span>
                   <button
-                    onClick={() => handleStartChat(rider.id)}
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                    title="Chat with Rider"
+                    onClick={() => rider.user && handleStartChat(rider.user)}
+                    disabled={!rider.user}
+                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={rider.user ? "Chat with Rider" : "Rider has no user account"}
                   >
                     <MessageSquare size={18} />
                   </button>
-                  <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal size={20} /></button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setOpenMenuId(openMenuId === rider.id ? null : rider.id)}
+                      className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                    >
+                      <MoreHorizontal size={20} />
+                    </button>
+
+                    {openMenuId === rider.id && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-10 py-1">
+                        <div className="px-4 py-2 border-b border-gray-50 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                          Change Status
+                        </div>
+                        <button
+                          onClick={() => handleStatusUpdate(rider.id, 'active')}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                          Set Active
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(rider.id, 'suspended')}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+                          Suspend Driver
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(rider.id, 'terminated')}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-red-600"></span>
+                          Terminate Driver
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
