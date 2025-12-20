@@ -1,6 +1,6 @@
 import React, { useState, Component, ErrorInfo } from 'react';
 import { MemoryRouter, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, Wallet, Settings, LifeBuoy, Menu, X, Bell, User as UserIcon, MessageSquare, AlertTriangle, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Wallet, Settings, LifeBuoy, Menu, X, Bell, User as UserIcon, MessageSquare, AlertTriangle, LogOut, Sun, Moon } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Deliveries from './pages/Deliveries';
 import Riders from './pages/Riders';
@@ -11,6 +11,7 @@ import Chat from './pages/Chat';
 import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
 import { isAuthenticated, logout } from './services/api';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 interface ErrorBoundaryProps {
   children?: React.ReactNode;
@@ -105,8 +106,8 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
       )}
 
       {/* Sidebar Content */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100">
+      <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-2 text-indigo-600 font-bold text-xl">
             <Package className="fill-indigo-600 text-white" />
             <span>LogiAdmin</span>
@@ -144,29 +145,44 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   );
 };
 
+const ThemeToggle = () => {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className="p-2 text-gray-400 hover:text-indigo-600 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+    >
+      {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+    </button>
+  );
+};
+
 const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-6 h-16 flex items-center justify-between transition-colors">
       <div className="flex items-center gap-4">
-        <button onClick={onMenuClick} className="lg:hidden text-gray-600 hover:text-gray-900">
+        <button onClick={onMenuClick} className="lg:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
           <Menu size={24} />
         </button>
-        <h2 className="text-gray-700 font-medium hidden sm:block">Company Admin Portal</h2>
+        <h2 className="text-gray-700 dark:text-gray-200 font-medium hidden sm:block">Company Admin Portal</h2>
       </div>
 
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <button className="relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
           <Bell size={20} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-gray-800"></span>
         </button>
-        <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+        <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700">
           <div className="text-right hidden md:block">
-            <p className="text-sm font-semibold text-gray-900">{user.first_name || user.username || 'Admin User'}</p>
-            <p className="text-xs text-gray-500">{user.role || 'Manager'}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{user.first_name || user.username || 'Admin User'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{user.role || 'Manager'}</p>
           </div>
-          <div className="h-9 w-9 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 border border-indigo-200">
+          <div className="h-9 w-9 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
             <UserIcon size={18} />
           </div>
         </div>
@@ -179,7 +195,7 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex transition-colors duration-200">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col lg:ml-64 transition-all duration-200">
         <Header onMenuClick={() => setSidebarOpen(true)} />
@@ -238,30 +254,32 @@ const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
 
 const App = () => {
   return (
-    <ErrorBoundary>
-      <MemoryRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/onboarding" element={
-            isAuthenticated() ? (
-              // If already has company, go to dashboard
-              JSON.parse(localStorage.getItem('user') || '{}').company ?
-                <Navigate to="/dashboard" replace /> :
-                <Onboarding />
-            ) : <Navigate to="/" replace />
-          } />
+    <ThemeProvider>
+      <ErrorBoundary>
+        <MemoryRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/onboarding" element={
+              isAuthenticated() ? (
+                // If already has company, go to dashboard
+                JSON.parse(localStorage.getItem('user') || '{}').company ?
+                  <Navigate to="/dashboard" replace /> :
+                  <Onboarding />
+              ) : <Navigate to="/" replace />
+            } />
 
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
-          <Route path="/riders" element={<ProtectedRoute><Riders /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-          <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-          <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
-        </Routes>
-      </MemoryRouter>
-    </ErrorBoundary>
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
+            <Route path="/riders" element={<ProtectedRoute><Riders /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+            <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+          </Routes>
+        </MemoryRouter>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 };
 
