@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Building, DollarSign, Plus, Edit2, Trash2, X, AlertCircle } from 'lucide-react';
-import { mockApi } from '../services/mockService';
+import {
+  getMyCompany,
+  updateMyCompany,
+  getPriceTiers,
+  createPriceTier,
+  updatePriceTier,
+  deletePriceTier,
+  getDistanceZones,
+  createDistanceZone,
+  updateDistanceZone,
+  deleteDistanceZone
+} from '../services/api';
 import { CompanyProfile, PriceTier, DistanceZone } from '../types';
 
 const SettingsPage = () => {
@@ -8,36 +19,53 @@ const SettingsPage = () => {
   const [priceTiers, setPriceTiers] = useState<PriceTier[]>([]);
   const [distanceZones, setDistanceZones] = useState<DistanceZone[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // Modals state
   const [activeModal, setActiveModal] = useState<'tier' | 'zone' | null>(null);
-  const [editingItem, setEditingItem] = useState<any>(null); // Holds the item being edited or null for new
+  const [editingItem, setEditingItem] = useState<any>(null);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [prof, tiers, zones] = await Promise.all([
-          mockApi.getCompanyProfile(),
-          mockApi.getPriceTiers(),
-          mockApi.getDistanceZones()
-        ]);
-        setProfile(prof);
-        setPriceTiers(tiers);
-        setDistanceZones(zones);
-      } catch (e) {
-        console.error("Failed to load settings", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [companyData, tiersData, zonesData] = await Promise.all([
+        getMyCompany().catch(() => ({ name: '', address: '', phone: '', support_email: '' })),
+        getPriceTiers().catch(() => []),
+        getDistanceZones().catch(() => [])
+      ]);
+
+      setProfile(companyData as CompanyProfile);
+      const tiersArray = Array.isArray(tiersData) ? tiersData : (tiersData as any)?.results || [];
+      const zonesArray = Array.isArray(zonesData) ? zonesData : (zonesData as any)?.results || [];
+      setPriceTiers(tiersArray);
+      setDistanceZones(zonesArray);
+    } catch (err) {
+      console.error("Failed to load settings", err);
+      setError(err instanceof Error ? err.message : 'Failed to load settings');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (profile) {
-      await mockApi.updateCompanyProfile(profile);
+    if (!profile) return;
+
+    setSaving(true);
+    try {
+      await updateMyCompany(profile);
       alert("Profile settings saved successfully!");
+    } catch (err) {
+      console.error('Failed to save profile:', err);
+      alert(err instanceof Error ? err.message : 'Failed to save profile');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -55,23 +83,29 @@ const SettingsPage = () => {
 
     try {
       if (editingItem) {
-        await mockApi.updatePriceTier(editingItem.id, tierData);
+        await updatePriceTier(editingItem.id, tierData);
         setPriceTiers(prev => prev.map(t => t.id === editingItem.id ? { ...tierData, id: editingItem.id } : t));
       } else {
-        const newTier = await mockApi.addPriceTier(tierData);
-        setPriceTiers(prev => [...prev, newTier]);
+        const newTier = await createPriceTier(tierData);
+        setPriceTiers(prev => [...prev, newTier as PriceTier]);
       }
       setActiveModal(null);
       setEditingItem(null);
     } catch (err) {
-      alert("Failed to save price tier");
+      console.error('Failed to save tier:', err);
+      alert(err instanceof Error ? err.message : 'Failed to save price tier');
     }
   };
 
   const handleDeleteTier = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this tier?")) {
-      await mockApi.deletePriceTier(id);
-      setPriceTiers(prev => prev.filter(t => t.id !== id));
+      try {
+        await deletePriceTier(id);
+        setPriceTiers(prev => prev.filter(t => t.id !== id));
+      } catch (err) {
+        console.error('Failed to delete tier:', err);
+        alert(err instanceof Error ? err.message : 'Failed to delete tier');
+      }
     }
   };
 
@@ -89,31 +123,45 @@ const SettingsPage = () => {
 
     try {
       if (editingItem) {
-        await mockApi.updateDistanceZone(editingItem.id, zoneData);
+        await updateDistanceZone(editingItem.id, zoneData);
         setDistanceZones(prev => prev.map(z => z.id === editingItem.id ? { ...zoneData, id: editingItem.id } : z));
       } else {
-        const newZone = await mockApi.addDistanceZone(zoneData);
-        setDistanceZones(prev => [...prev, newZone]);
+        const newZone = await createDistanceZone(zoneData);
+        setDistanceZones(prev => [...prev, newZone as DistanceZone]);
       }
       setActiveModal(null);
       setEditingItem(null);
     } catch (err) {
-      alert("Failed to save distance zone");
+      console.error('Failed to save zone:', err);
+      alert(err instanceof Error ? err.message : 'Failed to save distance zone');
     }
   };
 
   const handleDeleteZone = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this zone?")) {
-      await mockApi.deleteDistanceZone(id);
-      setDistanceZones(prev => prev.filter(z => z.id !== id));
+      try {
+        await deleteDistanceZone(id);
+        setDistanceZones(prev => prev.filter(z => z.id !== id));
+      } catch (err) {
+        console.error('Failed to delete zone:', err);
+        alert(err instanceof Error ? err.message : 'Failed to delete zone');
+      }
     }
   };
 
-  if (loading || !profile) return <div className="p-8 text-center text-gray-500">Loading settings...</div>;
+  if (loading) return <div className="p-8 text-center text-gray-500">Loading settings...</div>;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-10">
       <h1 className="text-2xl font-bold text-gray-900">Settings & Configuration</h1>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertCircle className="text-red-500" size={20} />
+          <span className="text-red-700">{error}</span>
+          <button onClick={loadData} className="ml-auto text-red-600 hover:underline text-sm">Retry</button>
+        </div>
+      )}
 
       {/* Company Profile */}
       <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
@@ -121,35 +169,39 @@ const SettingsPage = () => {
           <Building className="text-indigo-600" size={24} />
           <h2 className="text-lg font-bold text-gray-900">Company Profile</h2>
         </div>
-        
+
         <form onSubmit={handleSaveProfile} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
-             <label className="text-sm font-medium text-gray-700">Company Name</label>
-             <input 
-               value={profile.name} 
-               onChange={e => setProfile({...profile, name: e.target.value})}
-               className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900" 
-             />
+            <label className="text-sm font-medium text-gray-700">Company Name</label>
+            <input
+              value={profile?.name || ''}
+              onChange={e => setProfile(prev => prev ? { ...prev, name: e.target.value } : null)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+            />
           </div>
           <div className="space-y-1">
-             <label className="text-sm font-medium text-gray-700">Support Email</label>
-             <input 
-               value={profile.support_email} 
-               onChange={e => setProfile({...profile, support_email: e.target.value})}
-               className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900" 
-             />
+            <label className="text-sm font-medium text-gray-700">Support Email</label>
+            <input
+              value={profile?.support_email || ''}
+              onChange={e => setProfile(prev => prev ? { ...prev, support_email: e.target.value } : null)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+            />
           </div>
           <div className="space-y-1 md:col-span-2">
-             <label className="text-sm font-medium text-gray-700">Address</label>
-             <input 
-               value={profile.address} 
-               onChange={e => setProfile({...profile, address: e.target.value})}
-               className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900" 
-             />
+            <label className="text-sm font-medium text-gray-700">Address</label>
+            <input
+              value={profile?.address || ''}
+              onChange={e => setProfile(prev => prev ? { ...prev, address: e.target.value } : null)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+            />
           </div>
           <div className="md:col-span-2 flex justify-end">
-            <button type="submit" className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">
-              <Save size={18} /> Save Changes
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+            >
+              <Save size={18} /> {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -163,103 +215,103 @@ const SettingsPage = () => {
         </div>
 
         <div className="space-y-10">
-           {/* Price Tiers */}
-           <div>
-             <div className="flex items-center justify-between mb-4">
-               <div>
-                  <h3 className="font-bold text-gray-800 text-base">Base Price Tiers</h3>
-                  <p className="text-xs text-gray-500">Configure base delivery costs based on package weight.</p>
-               </div>
-               <button 
-                 onClick={() => { setEditingItem(null); setActiveModal('tier'); }}
-                 className="flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-lg font-semibold transition-colors"
-               >
-                 <Plus size={16} /> Add Tier
-               </button>
-             </div>
-             
-             <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
-                      <tr>
-                        <th className="p-3 font-medium">Name</th>
-                        <th className="p-3 font-medium">Weight (kg)</th>
-                        <th className="p-3 font-medium">Base Price</th>
-                        <th className="p-3 font-medium">Per KM</th>
-                        <th className="p-3 font-medium text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {priceTiers.map(tier => (
-                        <tr key={tier.id} className="hover:bg-gray-50 group">
-                          <td className="p-3 font-medium text-gray-900">{tier.name}</td>
-                          <td className="p-3 text-gray-600">{tier.min_weight} - {tier.max_weight} kg</td>
-                          <td className="p-3 text-gray-900">₦{tier.base_price.toLocaleString()}</td>
-                          <td className="p-3 text-gray-900">₦{tier.price_per_km}</td>
-                          <td className="p-3 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => { setEditingItem(tier); setActiveModal('tier'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14} /></button>
-                            <button onClick={() => handleDeleteTier(tier.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
-                          </td>
-                        </tr>
-                      ))}
-                      {priceTiers.length === 0 && (
-                        <tr><td colSpan={5} className="p-4 text-center text-gray-500 text-xs">No price tiers defined.</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-             </div>
-           </div>
+          {/* Price Tiers */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-gray-800 text-base">Base Price Tiers</h3>
+                <p className="text-xs text-gray-500">Configure base delivery costs based on package weight.</p>
+              </div>
+              <button
+                onClick={() => { setEditingItem(null); setActiveModal('tier'); }}
+                className="flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-lg font-semibold transition-colors"
+              >
+                <Plus size={16} /> Add Tier
+              </button>
+            </div>
 
-           {/* Distance Zones */}
-           <div>
-             <div className="flex items-center justify-between mb-4">
-               <div>
-                  <h3 className="font-bold text-gray-800 text-base">Distance Zones</h3>
-                  <p className="text-xs text-gray-500">Apply surcharges or multipliers based on delivery distance.</p>
-               </div>
-               <button 
-                 onClick={() => { setEditingItem(null); setActiveModal('zone'); }}
-                 className="flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-lg font-semibold transition-colors"
-               >
-                 <Plus size={16} /> Add Zone
-               </button>
-             </div>
-             
-             <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
-                      <tr>
-                        <th className="p-3 font-medium">Name</th>
-                        <th className="p-3 font-medium">Distance (km)</th>
-                        <th className="p-3 font-medium">Surcharge</th>
-                        <th className="p-3 font-medium">Multiplier</th>
-                        <th className="p-3 font-medium text-right">Actions</th>
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+                    <tr>
+                      <th className="p-3 font-medium">Name</th>
+                      <th className="p-3 font-medium">Weight (kg)</th>
+                      <th className="p-3 font-medium">Base Price</th>
+                      <th className="p-3 font-medium">Per KM</th>
+                      <th className="p-3 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {priceTiers.map(tier => (
+                      <tr key={tier.id} className="hover:bg-gray-50 group">
+                        <td className="p-3 font-medium text-gray-900">{tier.name}</td>
+                        <td className="p-3 text-gray-600">{tier.min_weight} - {tier.max_weight} kg</td>
+                        <td className="p-3 text-gray-900">₦{tier.base_price.toLocaleString()}</td>
+                        <td className="p-3 text-gray-900">₦{tier.price_per_km}</td>
+                        <td className="p-3 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => { setEditingItem(tier); setActiveModal('tier'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14} /></button>
+                          <button onClick={() => handleDeleteTier(tier.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {distanceZones.map(zone => (
-                        <tr key={zone.id} className="hover:bg-gray-50 group">
-                          <td className="p-3 font-medium text-gray-900">{zone.name}</td>
-                          <td className="p-3 text-gray-600">{zone.min_distance} - {zone.max_distance} km</td>
-                          <td className="p-3 text-gray-900">{zone.surcharge_amount > 0 ? `+₦${zone.surcharge_amount.toLocaleString()}` : '-'}</td>
-                          <td className="p-3 text-gray-900">{zone.price_multiplier}x</td>
-                          <td className="p-3 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => { setEditingItem(zone); setActiveModal('zone'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14} /></button>
-                            <button onClick={() => handleDeleteZone(zone.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
-                          </td>
-                        </tr>
-                      ))}
-                      {distanceZones.length === 0 && (
-                        <tr><td colSpan={5} className="p-4 text-center text-gray-500 text-xs">No distance zones defined.</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-             </div>
-           </div>
+                    ))}
+                    {priceTiers.length === 0 && (
+                      <tr><td colSpan={5} className="p-4 text-center text-gray-500 text-xs">No price tiers defined.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Distance Zones */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-gray-800 text-base">Distance Zones</h3>
+                <p className="text-xs text-gray-500">Apply surcharges or multipliers based on delivery distance.</p>
+              </div>
+              <button
+                onClick={() => { setEditingItem(null); setActiveModal('zone'); }}
+                className="flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-lg font-semibold transition-colors"
+              >
+                <Plus size={16} /> Add Zone
+              </button>
+            </div>
+
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+                    <tr>
+                      <th className="p-3 font-medium">Name</th>
+                      <th className="p-3 font-medium">Distance (km)</th>
+                      <th className="p-3 font-medium">Surcharge</th>
+                      <th className="p-3 font-medium">Multiplier</th>
+                      <th className="p-3 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {distanceZones.map(zone => (
+                      <tr key={zone.id} className="hover:bg-gray-50 group">
+                        <td className="p-3 font-medium text-gray-900">{zone.name}</td>
+                        <td className="p-3 text-gray-600">{zone.min_distance} - {zone.max_distance} km</td>
+                        <td className="p-3 text-gray-900">{zone.surcharge_amount > 0 ? `+₦${zone.surcharge_amount.toLocaleString()}` : '-'}</td>
+                        <td className="p-3 text-gray-900">{zone.price_multiplier}x</td>
+                        <td className="p-3 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => { setEditingItem(zone); setActiveModal('zone'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14} /></button>
+                          <button onClick={() => handleDeleteZone(zone.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                        </td>
+                      </tr>
+                    ))}
+                    {distanceZones.length === 0 && (
+                      <tr><td colSpan={5} className="p-4 text-center text-gray-500 text-xs">No distance zones defined.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -271,9 +323,9 @@ const SettingsPage = () => {
               <h3 className="font-bold text-lg text-gray-900">
                 {editingItem ? 'Edit' : 'Add'} {activeModal === 'tier' ? 'Price Tier' : 'Distance Zone'}
               </h3>
-              <button onClick={() => { setActiveModal(null); setEditingItem(null); }} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20}/></button>
+              <button onClick={() => { setActiveModal(null); setEditingItem(null); }} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
             </div>
-            
+
             {activeModal === 'tier' ? (
               <form onSubmit={handleSaveTier} className="p-6 space-y-4">
                 <div>
@@ -301,8 +353,8 @@ const SettingsPage = () => {
                   </div>
                 </div>
                 <div className="pt-2 flex justify-end gap-3">
-                   <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</button>
-                   <button type="submit" className="px-6 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Tier</button>
+                  <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</button>
+                  <button type="submit" className="px-6 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Tier</button>
                 </div>
               </form>
             ) : (
@@ -332,12 +384,12 @@ const SettingsPage = () => {
                   </div>
                 </div>
                 <div className="bg-amber-50 p-3 rounded-lg flex gap-2 items-start border border-amber-100">
-                   <AlertCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
-                   <p className="text-xs text-amber-700">Multiplier applies to the total calculated base cost.</p>
+                  <AlertCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
+                  <p className="text-xs text-amber-700">Multiplier applies to the total calculated base cost.</p>
                 </div>
                 <div className="pt-2 flex justify-end gap-3">
-                   <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</button>
-                   <button type="submit" className="px-6 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Zone</button>
+                  <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</button>
+                  <button type="submit" className="px-6 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Zone</button>
                 </div>
               </form>
             )}

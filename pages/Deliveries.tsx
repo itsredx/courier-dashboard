@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Filter, MapPin, Search, User, X } from 'lucide-react';
-import { mockApi } from '../services/mockService';
+import { Filter, MapPin, Search, User, X, AlertCircle } from 'lucide-react';
+import { getDeliveries, getDrivers, assignDriver as apiAssignDriver } from '../services/api';
 import { Delivery, Driver } from '../types';
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -25,6 +25,8 @@ const Deliveries = () => {
   const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
   const [isAssignModalOpen, setAssignModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -33,21 +35,41 @@ const Deliveries = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const [delData, driverData] = await Promise.all([
-      mockApi.getDeliveries(filter),
-      mockApi.getDrivers()
-    ]);
-    setDeliveries(delData);
-    setDrivers(driverData.filter(d => d.status === 'active')); // Only active drivers
-    setLoading(false);
+    setError(null);
+    try {
+      const [delData, driverData] = await Promise.all([
+        getDeliveries(filter),
+        getDrivers()
+      ]);
+
+      // Handle API response - could be array or paginated object
+      const deliveriesArray = Array.isArray(delData) ? delData : (delData as any)?.results || [];
+      const driversArray = Array.isArray(driverData) ? driverData : (driverData as any)?.results || [];
+
+      setDeliveries(deliveriesArray);
+      setDrivers(driversArray.filter((d: Driver) => d.status === 'active'));
+    } catch (err) {
+      console.error('Failed to fetch deliveries:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load deliveries');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAssign = async (driverId: number) => {
     if (!selectedDelivery) return;
-    await mockApi.assignDriver(selectedDelivery.id, driverId);
-    setAssignModalOpen(false);
-    setSelectedDelivery(null);
-    fetchData(); // Refresh list
+    setAssigning(true);
+    try {
+      await apiAssignDriver(selectedDelivery.id, driverId);
+      setAssignModalOpen(false);
+      setSelectedDelivery(null);
+      fetchData(); // Refresh list
+    } catch (err) {
+      console.error('Failed to assign driver:', err);
+      alert(err instanceof Error ? err.message : 'Failed to assign driver');
+    } finally {
+      setAssigning(false);
+    }
   };
 
   return (
@@ -57,27 +79,36 @@ const Deliveries = () => {
         <div className="flex gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search ID or Customer..." 
+            <input
+              type="text"
+              placeholder="Search ID or Customer..."
               className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg w-full text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
             />
           </div>
           <div className="relative">
             <Filter className="absolute left-3 top-2.5 text-gray-400" size={16} />
-            <select 
+            <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="pl-10 pr-8 py-2 bg-white border border-gray-200 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer text-gray-900"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
+              <option value="assigned">Assigned</option>
               <option value="in_transit">In Transit</option>
               <option value="delivered">Delivered</option>
             </select>
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertCircle className="text-red-500" size={20} />
+          <span className="text-red-700">{error}</span>
+          <button onClick={fetchData} className="ml-auto text-red-600 hover:underline text-sm">Retry</button>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -114,7 +145,7 @@ const Deliveries = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-sm text-gray-700">{d.customer.name}</td>
+                    <td className="p-4 text-sm text-gray-700">{d.customer?.name || 'N/A'}</td>
                     <td className="p-4">
                       {d.driver ? (
                         <div className="flex items-center gap-2">
@@ -127,18 +158,18 @@ const Deliveries = () => {
                         <span className="text-xs text-gray-400 italic">Unassigned</span>
                       )}
                     </td>
-                    <td className="p-4 text-sm font-medium text-gray-900">₦{d.estimated_price.toLocaleString()}</td>
+                    <td className="p-4 text-sm font-medium text-gray-900">₦{(d.estimated_price || 0).toLocaleString()}</td>
                     <td className="p-4"><StatusBadge status={d.status} /></td>
                     <td className="p-4 text-right">
                       {d.status === 'pending' && (
-                        <button 
+                        <button
                           onClick={() => { setSelectedDelivery(d); setAssignModalOpen(true); }}
                           className="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
                         >
                           Assign
                         </button>
                       )}
-                       {d.status !== 'pending' && (
+                      {d.status !== 'pending' && (
                         <button className="text-xs text-gray-500 hover:text-gray-900 px-3 py-1.5">
                           Details
                         </button>
@@ -158,7 +189,7 @@ const Deliveries = () => {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">Assign Driver</h3>
-              <button onClick={() => setAssignModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
+              <button onClick={() => setAssignModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
             </div>
             <div className="p-6 bg-gray-50 border-b border-gray-100">
               <p className="text-sm text-gray-500 mb-2">Delivery Route</p>
@@ -174,24 +205,31 @@ const Deliveries = () => {
             <div className="p-4 max-h-64 overflow-y-auto">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Available Drivers</p>
               <div className="space-y-2">
-                {drivers.map(driver => (
-                  <button 
-                    key={driver.id}
-                    onClick={() => handleAssign(driver.id)}
-                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all group"
-                  >
-                    <div className="flex items-center gap-3">
-                       <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-indigo-200 group-hover:text-indigo-700">
-                         <User size={16} />
-                       </div>
-                       <div className="text-left">
-                         <p className="text-sm font-medium text-gray-900">{driver.name}</p>
-                         <p className="text-xs text-gray-500">Rating: {driver.rating} ★</p>
-                       </div>
-                    </div>
-                    <span className="text-xs text-indigo-600 opacity-0 group-hover:opacity-100 font-medium">Select</span>
-                  </button>
-                ))}
+                {drivers.length === 0 ? (
+                  <div className="text-center text-gray-500 py-4">No active drivers available</div>
+                ) : (
+                  drivers.map(driver => (
+                    <button
+                      key={driver.id}
+                      onClick={() => handleAssign(driver.id)}
+                      disabled={assigning}
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all group disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-indigo-200 group-hover:text-indigo-700">
+                          <User size={16} />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-sm font-medium text-gray-900">{driver.name}</p>
+                          <p className="text-xs text-gray-500">Rating: {driver.rating || 'N/A'} ★</p>
+                        </div>
+                      </div>
+                      <span className="text-xs text-indigo-600 opacity-0 group-hover:opacity-100 font-medium">
+                        {assigning ? 'Assigning...' : 'Select'}
+                      </span>
+                    </button>
+                  ))
+                )}
               </div>
             </div>
           </div>
