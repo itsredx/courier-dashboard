@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Chat from './pages/Chat';
 import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
+import Support from './pages/Support';
 import { isAuthenticated, logout } from './services/api';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
@@ -211,16 +212,7 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
 
 // --- Main App & Routes ---
 
-const Support = () => (
-  <div className="space-y-6">
-    <h1 className="text-2xl font-bold text-gray-900">Support & Disputes</h1>
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center py-12">
-      <LifeBuoy size={48} className="mx-auto text-gray-300 mb-4" />
-      <h3 className="text-lg font-medium text-gray-900">No active disputes</h3>
-      <p className="text-gray-500">Great job! All deliveries are running smoothly.</p>
-    </div>
-  </div>
-);
+
 
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
   // Check real auth state from tokens

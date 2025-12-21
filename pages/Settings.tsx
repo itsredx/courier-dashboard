@@ -172,27 +172,27 @@ const SettingsPage = () => {
 
         <form onSubmit={handleSaveProfile} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Company Name</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
             <input
               value={profile?.name || ''}
               onChange={e => setProfile(prev => prev ? { ...prev, name: e.target.value } : null)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+              className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Support Email</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Support Email</label>
             <input
               value={profile?.support_email || ''}
               onChange={e => setProfile(prev => prev ? { ...prev, support_email: e.target.value } : null)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+              className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white"
             />
           </div>
           <div className="space-y-1 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700">Address</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
             <input
               value={profile?.address || ''}
               onChange={e => setProfile(prev => prev ? { ...prev, address: e.target.value } : null)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+              className="w-full p-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white"
             />
           </div>
           <div className="md:col-span-2 flex justify-end">
