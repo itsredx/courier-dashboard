@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Phone, MapPin, MoreHorizontal, MessageSquare, AlertCircle } from 'lucide-react';
 import { getDrivers, inviteDriver as apiInviteDriver, startConversation as apiStartConversation, updateDriverStatus } from '../services/api';
@@ -128,42 +129,93 @@ const Riders = () => {
         </div>
       )}
 
-      {showInviteForm && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 animate-in fade-in slide-in-from-top-4 duration-300">
-          <h3 className="font-bold text-gray-900 dark:text-white mb-4">Invite New Rider</h3>
-          <form onSubmit={handleInvite} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="text"
-              placeholder="Full Name"
-              required
-              value={inviteData.name}
-              onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
-            />
-            <input
-              type="email"
-              placeholder="Email Address"
-              required
-              value={inviteData.email}
-              onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
-            />
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              required
-              value={inviteData.phone}
-              onChange={(e) => setInviteData({ ...inviteData, phone: e.target.value })}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
-            />
-            <div className="md:col-span-3 flex justify-end gap-2 mt-2">
-              <button type="button" onClick={() => setShowInviteForm(false)} className="text-gray-500 hover:text-gray-700 px-4 py-2 text-sm font-medium">Cancel</button>
-              <button type="submit" disabled={inviting} className="bg-gray-900 text-white hover:bg-black px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50">
-                {inviting ? 'Sending...' : 'Send Invitation'}
+      {/* Invite Driver Drawer */}
+      {showInviteForm && createPortal(
+        <div className="fixed inset-0 z-50 flex justify-end font-sans">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+            onClick={() => setShowInviteForm(false)}
+          />
+
+          {/* Drawer */}
+          <div className="relative w-full max-w-md bg-white dark:bg-gray-800 h-full shadow-2xl flex flex-col transition-transform animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <UserPlus className="text-indigo-600" size={24} />
+                Invite New Rider
+              </h2>
+              <button
+                onClick={() => setShowInviteForm(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500 dark:text-gray-400 transition-colors"
+              >
+                ✕
               </button>
             </div>
-          </form>
-        </div>
+
+            <div className="p-6 flex-1 overflow-y-auto">
+              <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-700 dark:text-indigo-300 text-sm">
+                Send an invitation to a new rider. They will receive an email with instructions to join your fleet.
+              </div>
+
+              <form onSubmit={handleInvite} className="space-y-6">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={inviteData.name}
+                    onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })}
+                    className="w-full mt-2 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="e.g. John Doe"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
+                    className="w-full mt-2 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="rider@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={inviteData.phone}
+                    onChange={(e) => setInviteData({ ...inviteData, phone: e.target.value })}
+                    className="w-full mt-2 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="+234..."
+                  />
+                </div>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={inviting}
+                    className="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-lg shadow-indigo-200"
+                  >
+                    {inviting ? 'Sending Invitation...' : 'Send Invitation'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteForm(false)}
+                    className="w-full mt-3 text-gray-500 dark:text-gray-400 py-3 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Grid of Riders & Map */}
