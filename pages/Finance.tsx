@@ -83,7 +83,7 @@ const Finance = () => {
       )}
 
       {/* Wallet Card */}
-      <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-8 text-white shadow-lg shadow-indigo-200">
+      <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-8 text-white shadow-md">
         <div className="flex items-center gap-3 mb-6 opacity-90">
           <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
             <Wallet size={24} />
@@ -239,7 +239,7 @@ const Finance = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-lg shadow-indigo-200"
+                    className="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-sm"
                   >
                     {submitting ? 'Processing Request...' : 'Confirm Withdrawal'}
                   </button>

@@ -199,7 +199,7 @@ const Riders = () => {
                   <button
                     type="submit"
                     disabled={inviting}
-                    className="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-lg shadow-indigo-200"
+                    className="w-full bg-indigo-600 text-white py-3.5 rounded-lg font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-sm"
                   >
                     {inviting ? 'Sending Invitation...' : 'Send Invitation'}
                   </button>
