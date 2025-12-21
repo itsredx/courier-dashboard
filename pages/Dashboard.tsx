@@ -66,10 +66,10 @@ const Dashboard = () => {
         const driversArray = Array.isArray(drivers) ? drivers : [];
 
         const statsData: DashboardStats = {
-          total_deliveries: summaryData?.total_deliveries ?? deliveriesArray.length,
+          total_deliveries: (summaryData as any)?.total_deliveries ?? deliveriesArray.length,
           active_deliveries: deliveriesArray.filter((d: Delivery) => d.status === 'in_transit' || d.status === 'assigned').length,
           active_drivers: driversArray.filter((d: Driver) => d.status === 'active').length,
-          total_revenue: summaryData?.financials?.total_revenue ?? 0,
+          total_revenue: (summaryData as any)?.financials?.total_revenue ?? 0,
           recent_deliveries: deliveriesArray.slice(0, 5),
           top_rated_drivers: driversArray
             .filter((d: Driver) => d.rating)
