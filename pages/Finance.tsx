@@ -179,26 +179,26 @@ const Finance = () => {
 
               <form onSubmit={handlePayout} className="space-y-6">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Amount to Withdraw</label>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Amount to Withdraw</label>
                   <input
                     type="number"
                     value={payoutData.amount}
                     onChange={(e) => setPayoutData({ ...payoutData, amount: e.target.value })}
-                    className="w-full mt-2 p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 font-medium"
+                    className="w-full mt-2 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white font-medium"
                     placeholder="0.00"
                     required
                   />
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-gray-900 border-t border-gray-100 pt-4">Bank Details</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white border-t border-gray-100 dark:border-gray-700 pt-4">Bank Details</h4>
 
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase">Bank Name</label>
+                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Bank Name</label>
                     <select
                       value={payoutData.bank_name}
                       onChange={(e) => setPayoutData({ ...payoutData, bank_name: e.target.value })}
-                      className="w-full mt-1 p-3 bg-white border border-gray-200 rounded-lg outline-none text-gray-900"
+                      className="w-full mt-1 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg outline-none text-gray-900 dark:text-white"
                     >
                       <option>GTBank</option>
                       <option>Zenith Bank</option>
@@ -211,24 +211,24 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase">Account Number</label>
+                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Account Number</label>
                     <input
                       type="text"
                       value={payoutData.account_number}
                       onChange={(e) => setPayoutData({ ...payoutData, account_number: e.target.value })}
-                      className="w-full mt-1 p-3 bg-white border border-gray-200 rounded-lg outline-none text-gray-900"
+                      className="w-full mt-1 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg outline-none text-gray-900 dark:text-white"
                       placeholder="0123456789"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase">Account Name</label>
+                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Account Name</label>
                     <input
                       type="text"
                       value={payoutData.account_name}
                       onChange={(e) => setPayoutData({ ...payoutData, account_name: e.target.value })}
-                      className="w-full mt-1 p-3 bg-white border border-gray-200 rounded-lg outline-none text-gray-900"
+                      className="w-full mt-1 p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg outline-none text-gray-900 dark:text-white"
                       placeholder="Account holder name"
                       required
                     />
