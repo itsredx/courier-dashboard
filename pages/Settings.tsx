@@ -153,7 +153,7 @@ const SettingsPage = () => {
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-10">
-      <h1 className="text-2xl font-bold text-gray-900">Settings & Configuration</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings & Configuration</h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
@@ -164,10 +164,10 @@ const SettingsPage = () => {
       )}
 
       {/* Company Profile */}
-      <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
-          <Building className="text-indigo-600" size={24} />
-          <h2 className="text-lg font-bold text-gray-900">Company Profile</h2>
+      <section className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+          <Building className="text-indigo-600 dark:text-indigo-400" size={24} />
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Company Profile</h2>
         </div>
 
         <form onSubmit={handleSaveProfile} className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,10 +208,10 @@ const SettingsPage = () => {
       </section>
 
       {/* Pricing Configuration */}
-      <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
-          <DollarSign className="text-green-600" size={24} />
-          <h2 className="text-lg font-bold text-gray-900">Pricing Configuration</h2>
+      <section className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+          <DollarSign className="text-green-600 dark:text-green-500" size={24} />
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Pricing Configuration</h2>
         </div>
 
         <div className="space-y-10">
@@ -219,21 +219,21 @@ const SettingsPage = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold text-gray-800 text-base">Base Price Tiers</h3>
-                <p className="text-xs text-gray-500">Configure base delivery costs based on package weight.</p>
+                <h3 className="font-bold text-gray-800 dark:text-white text-base">Base Price Tiers</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Configure base delivery costs based on package weight.</p>
               </div>
               <button
                 onClick={() => { setEditingItem(null); setActiveModal('tier'); }}
-                className="flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-lg font-semibold transition-colors"
+                className="flex items-center gap-1.5 text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 px-3 py-2 rounded-lg font-semibold transition-colors"
               >
                 <Plus size={16} /> Add Tier
               </button>
             </div>
 
-            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
                     <tr>
                       <th className="p-3 font-medium">Name</th>
                       <th className="p-3 font-medium">Weight (kg)</th>
@@ -242,16 +242,16 @@ const SettingsPage = () => {
                       <th className="p-3 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {priceTiers.map(tier => (
-                      <tr key={tier.id} className="hover:bg-gray-50 group">
-                        <td className="p-3 font-medium text-gray-900">{tier.name}</td>
-                        <td className="p-3 text-gray-600">{tier.min_weight} - {tier.max_weight} kg</td>
-                        <td className="p-3 text-gray-900">₦{tier.base_price.toLocaleString()}</td>
-                        <td className="p-3 text-gray-900">₦{tier.price_per_km}</td>
+                      <tr key={tier.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
+                        <td className="p-3 font-medium text-gray-900 dark:text-white">{tier.name}</td>
+                        <td className="p-3 text-gray-600 dark:text-gray-400">{tier.min_weight} - {tier.max_weight} kg</td>
+                        <td className="p-3 text-gray-900 dark:text-white">₦{tier.base_price.toLocaleString()}</td>
+                        <td className="p-3 text-gray-900 dark:text-white">₦{tier.price_per_km}</td>
                         <td className="p-3 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => { setEditingItem(tier); setActiveModal('tier'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14} /></button>
-                          <button onClick={() => handleDeleteTier(tier.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                          <button onClick={() => { setEditingItem(tier); setActiveModal('tier'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded"><Edit2 size={14} /></button>
+                          <button onClick={() => handleDeleteTier(tier.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><Trash2 size={14} /></button>
                         </td>
                       </tr>
                     ))}
@@ -268,21 +268,21 @@ const SettingsPage = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold text-gray-800 text-base">Distance Zones</h3>
-                <p className="text-xs text-gray-500">Apply surcharges or multipliers based on delivery distance.</p>
+                <h3 className="font-bold text-gray-800 dark:text-white text-base">Distance Zones</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Apply surcharges or multipliers based on delivery distance.</p>
               </div>
               <button
                 onClick={() => { setEditingItem(null); setActiveModal('zone'); }}
-                className="flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 rounded-lg font-semibold transition-colors"
+                className="flex items-center gap-1.5 text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 px-3 py-2 rounded-lg font-semibold transition-colors"
               >
                 <Plus size={16} /> Add Zone
               </button>
             </div>
 
-            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
                     <tr>
                       <th className="p-3 font-medium">Name</th>
                       <th className="p-3 font-medium">Distance (km)</th>
@@ -291,16 +291,16 @@ const SettingsPage = () => {
                       <th className="p-3 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {distanceZones.map(zone => (
-                      <tr key={zone.id} className="hover:bg-gray-50 group">
-                        <td className="p-3 font-medium text-gray-900">{zone.name}</td>
-                        <td className="p-3 text-gray-600">{zone.min_distance} - {zone.max_distance} km</td>
-                        <td className="p-3 text-gray-900">{zone.surcharge_amount > 0 ? `+₦${zone.surcharge_amount.toLocaleString()}` : '-'}</td>
-                        <td className="p-3 text-gray-900">{zone.price_multiplier}x</td>
+                      <tr key={zone.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">
+                        <td className="p-3 font-medium text-gray-900 dark:text-white">{zone.name}</td>
+                        <td className="p-3 text-gray-600 dark:text-gray-400">{zone.min_distance} - {zone.max_distance} km</td>
+                        <td className="p-3 text-gray-900 dark:text-white">{zone.surcharge_amount > 0 ? `+₦${zone.surcharge_amount.toLocaleString()}` : '-'}</td>
+                        <td className="p-3 text-gray-900 dark:text-white">{zone.price_multiplier}x</td>
                         <td className="p-3 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => { setEditingItem(zone); setActiveModal('zone'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"><Edit2 size={14} /></button>
-                          <button onClick={() => handleDeleteZone(zone.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                          <button onClick={() => { setEditingItem(zone); setActiveModal('zone'); }} className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded"><Edit2 size={14} /></button>
+                          <button onClick={() => handleDeleteZone(zone.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><Trash2 size={14} /></button>
                         </td>
                       </tr>
                     ))}
@@ -318,12 +318,12 @@ const SettingsPage = () => {
       {/* Modals */}
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h3 className="font-bold text-lg text-gray-900">
+          <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white">
                 {editingItem ? 'Edit' : 'Add'} {activeModal === 'tier' ? 'Price Tier' : 'Distance Zone'}
               </h3>
-              <button onClick={() => { setActiveModal(null); setEditingItem(null); }} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
+              <button onClick={() => { setActiveModal(null); setEditingItem(null); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"><X size={20} /></button>
             </div>
 
             {activeModal === 'tier' ? (
