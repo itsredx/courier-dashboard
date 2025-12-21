@@ -5,6 +5,11 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f3f4f6;
+  transition: background-color 0.2s ease;
+}
+
+html.dark body {
+  background-color: #030712;
 }
 
 /* Custom scrollbar for tables */
