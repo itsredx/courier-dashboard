@@ -192,18 +192,18 @@ const Deliveries = () => {
               <button onClick={() => setAssignModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><X size={20} /></button>
             </div>
             <div className="p-6 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-              <p className="text-sm text-gray-500 mb-2">Delivery Route</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Delivery Route</p>
               <div className="flex items-start gap-3 mb-2">
                 <MapPin size={16} className="text-green-500 mt-0.5" />
-                <span className="text-sm text-gray-900">{selectedDelivery.pickup_address}</span>
+                <span className="text-sm text-gray-900 dark:text-gray-300">{selectedDelivery.pickup_address}</span>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="text-red-500 mt-0.5" />
-                <span className="text-sm text-gray-900">{selectedDelivery.dropoff_address}</span>
+                <span className="text-sm text-gray-900 dark:text-gray-300">{selectedDelivery.dropoff_address}</span>
               </div>
             </div>
             <div className="p-4 max-h-64 overflow-y-auto">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Available Drivers</p>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-2">Available Drivers</p>
               <div className="space-y-2">
                 {drivers.length === 0 ? (
                   <div className="text-center text-gray-500 py-4">No active drivers available</div>
@@ -213,15 +213,15 @@ const Deliveries = () => {
                       key={driver.id}
                       onClick={() => handleAssign(driver.id)}
                       disabled={assigning}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all group disabled:opacity-50"
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800 transition-all group disabled:opacity-50"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-indigo-200 group-hover:text-indigo-700">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800 group-hover:text-indigo-700 dark:group-hover:text-indigo-300">
                           <User size={16} />
                         </div>
                         <div className="text-left">
-                          <p className="text-sm font-medium text-gray-900">{driver.name}</p>
-                          <p className="text-xs text-gray-500">Rating: {driver.rating || 'N/A'} ★</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{driver.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Rating: {driver.rating || 'N/A'} ★</p>
                         </div>
                       </div>
                       <span className="text-xs text-indigo-600 opacity-0 group-hover:opacity-100 font-medium">
