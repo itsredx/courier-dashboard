@@ -110,7 +110,7 @@ const Riders = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Riders Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Riders Management</h1>
         <button
           onClick={() => setShowInviteForm(!showInviteForm)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors shadow-sm"
@@ -129,8 +129,8 @@ const Riders = () => {
       )}
 
       {showInviteForm && (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
-          <h3 className="font-bold text-gray-900 mb-4">Invite New Rider</h3>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 animate-in fade-in slide-in-from-top-4 duration-300">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4">Invite New Rider</h3>
           <form onSubmit={handleInvite} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
               type="text"
@@ -178,14 +178,14 @@ const Riders = () => {
             </div>
           ) : (
             riders.map(rider => (
-              <div key={rider.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+              <div key={rider.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold text-lg">
                     {rider.name.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900">{rider.name}</h4>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                    <h4 className="font-bold text-gray-900 dark:text-white">{rider.name}</h4>
+                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1">
                       <span className="flex items-center gap-1"><Phone size={12} /> {rider.phone || 'N/A'}</span>
                       <span className="flex items-center gap-1">★ {rider.rating || 'N/A'}</span>
                     </div>
@@ -200,7 +200,7 @@ const Riders = () => {
                   <button
                     onClick={() => rider.user && handleStartChat(rider.user)}
                     disabled={!rider.user}
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title={rider.user ? "Chat with Rider" : "Rider has no user account"}
                   >
                     <MessageSquare size={18} />
@@ -208,19 +208,19 @@ const Riders = () => {
                   <div className="relative">
                     <button
                       onClick={() => setOpenMenuId(openMenuId === rider.id ? null : rider.id)}
-                      className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
                     >
                       <MoreHorizontal size={20} />
                     </button>
 
                     {openMenuId === rider.id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-10 py-1">
-                        <div className="px-4 py-2 border-b border-gray-50 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-10 py-1">
+                        <div className="px-4 py-2 border-b border-gray-50 dark:border-gray-700 text-xs font-bold text-gray-400 uppercase tracking-wider">
                           Change Status
                         </div>
                         <button
                           onClick={() => handleStatusUpdate(rider.id, 'active')}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center gap-2"
                         >
                           <span className="w-2 h-2 rounded-full bg-green-500"></span>
                           Set Active
@@ -249,12 +249,12 @@ const Riders = () => {
         </div>
 
         {/* Live Fleet Map */}
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col h-[500px]">
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col h-[500px]">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <MapPin size={18} className="text-indigo-600" />
             Live Fleet Map
           </h3>
-          <div className="flex-1 bg-gray-50 rounded-lg relative overflow-hidden z-0">
+          <div className="flex-1 bg-gray-50 dark:bg-gray-900/50 rounded-lg relative overflow-hidden z-0">
             <MapContainer
               center={[6.5244, 3.3792]}
               zoom={12}
