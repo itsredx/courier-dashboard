@@ -72,7 +72,7 @@ const Finance = () => {
 
   return (
     <div className="space-y-6 relative">
-      <h1 className="text-2xl font-bold text-gray-900">Finance & Wallet</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Finance & Wallet</h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
@@ -97,7 +97,7 @@ const Finance = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setShowDrawer(true)}
-            className="flex-1 bg-white text-indigo-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+            className="flex-1 bg-white text-indigo-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
           >
             Withdraw
           </button>
@@ -108,13 +108,13 @@ const Finance = () => {
       </div>
 
       {/* Transactions */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900">Recent Transactions</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <h3 className="font-bold text-gray-900 dark:text-white">Recent Transactions</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+            <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 uppercase text-xs">
               <tr>
                 <th className="p-4">Type</th>
                 <th className="p-4">Description</th>
@@ -122,21 +122,21 @@ const Finance = () => {
                 <th className="p-4 text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {transactions.length === 0 ? (
                 <tr><td colSpan={4} className="p-8 text-center text-gray-500">No transactions found</td></tr>
               ) : (
                 transactions.map(t => (
-                  <tr key={t.id} className="hover:bg-gray-50">
+                  <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td className="p-4">
                       <span className={`flex items-center gap-2 font-medium ${t.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
                         {t.type === 'credit' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                         {t.type.toUpperCase()}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-900">{t.description}</td>
-                    <td className="p-4 text-gray-500">{new Date(t.date).toLocaleDateString()}</td>
-                    <td className={`p-4 text-right font-bold ${t.type === 'credit' ? 'text-green-600' : 'text-gray-900'}`}>
+                    <td className="p-4 text-gray-900 dark:text-white">{t.description}</td>
+                    <td className="p-4 text-gray-500 dark:text-gray-400">{new Date(t.date).toLocaleDateString()}</td>
+                    <td className={`p-4 text-right font-bold ${t.type === 'credit' ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
                       {t.type === 'credit' ? '+' : '-'} ₦{t.amount.toLocaleString()}
                     </td>
                   </tr>
@@ -157,22 +157,22 @@ const Finance = () => {
           />
 
           {/* Drawer */}
-          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col transition-transform animate-in slide-in-from-right duration-300">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <div className="relative w-full max-w-md bg-white dark:bg-gray-800 h-full shadow-2xl flex flex-col transition-transform animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Landmark className="text-indigo-600" />
                 Request Payout
               </h2>
               <button
                 onClick={() => setShowDrawer(false)}
-                className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500 dark:text-gray-400 transition-colors"
               >
                 ✕
               </button>
             </div>
 
             <div className="p-6 flex-1 overflow-y-auto">
-              <div className="mb-6 p-4 bg-indigo-50 rounded-lg text-indigo-700 text-sm">
+              <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-700 dark:text-indigo-300 text-sm">
                 Available for withdrawal: <br />
                 <span className="text-xl font-bold">{wallet?.currency || 'NGN'} {(wallet?.balance || 0).toLocaleString()}</span>
               </div>

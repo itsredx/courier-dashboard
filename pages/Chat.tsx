@@ -121,17 +121,17 @@ const Chat = () => {
   const activeParticipant = activeConversation ? getOtherParticipant(activeConversation) : null;
 
   return (
-    <div className="h-[calc(100vh-140px)] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col md:flex-row">
+    <div className="h-[calc(100vh-140px)] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col md:flex-row">
       {/* Sidebar - Conversation List */}
-      <div className={`w-full md:w-80 border-r border-gray-200 flex flex-col ${activeConversationId ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Messages</h2>
+      <div className={`w-full md:w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col ${activeConversationId ? 'hidden md:flex' : 'flex'}`}>
+        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Messages</h2>
           <div className="relative">
             <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search chat..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white dark:placeholder-gray-400"
             />
           </div>
         </div>
@@ -155,24 +155,24 @@ const Chat = () => {
                 <button
                   key={conv.id}
                   onClick={() => setActiveConversationId(conv.id)}
-                  className={`w-full text-left p-4 flex items-center gap-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${isActive ? 'bg-indigo-50/60 border-indigo-100' : ''}`}
+                  className={`w-full text-left p-4 flex items-center gap-3 border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${isActive ? 'bg-indigo-50/60 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-900' : ''}`}
                 >
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-700 font-bold text-sm border border-indigo-50">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm border border-indigo-50 dark:border-indigo-800">
                       {getDisplayName(participant).charAt(0)}
                     </div>
                     {conv.unread_count ? (
-                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white"></span>
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white dark:border-gray-800"></span>
                     ) : null}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline mb-1">
-                      <h4 className={`font-semibold text-sm truncate ${isActive ? 'text-indigo-900' : 'text-gray-900'}`}>{getDisplayName(participant)}</h4>
+                      <h4 className={`font-semibold text-sm truncate ${isActive ? 'text-indigo-900 dark:text-indigo-300' : 'text-gray-900 dark:text-gray-100'}`}>{getDisplayName(participant)}</h4>
                       <span className="text-xs text-gray-400 shrink-0">
                         {new Date(conv.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className={`text-xs truncate ${conv.unread_count ? 'font-semibold text-gray-800' : 'text-gray-500'}`}>
+                    <p className={`text-xs truncate ${conv.unread_count ? 'font-semibold text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'}`}>
                       {conv.last_message?.content || "No messages yet"}
                     </p>
                   </div>
@@ -188,19 +188,19 @@ const Chat = () => {
         {activeConversationId ? (
           <>
             {/* Header */}
-            <div className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
+            <div className="h-16 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between px-6 bg-white dark:bg-gray-800">
               <div className="flex items-center gap-3">
-                <button onClick={() => setActiveConversationId(null)} className="md:hidden text-gray-500">
+                <button onClick={() => setActiveConversationId(null)} className="md:hidden text-gray-500 dark:text-gray-400">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                 </button>
                 {activeParticipant && (
                   <>
-                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-sm">
                       {getDisplayName(activeParticipant).charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-sm">{getDisplayName(activeParticipant)}</h3>
-                      <span className="text-xs text-green-600 flex items-center gap-1">
+                      <h3 className="font-bold text-gray-900 dark:text-white text-sm">{getDisplayName(activeParticipant)}</h3>
+                      <span className="text-xs text-green-600 dark:text-green-500 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                         Online
                       </span>
@@ -215,14 +215,14 @@ const Chat = () => {
             </div>
 
             {/* Messages Body */}
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50 dark:bg-gray-900/50 space-y-4">
               {messages.map((msg) => {
                 const isMe = msg.sender.id === currentUserId;
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm text-sm ${isMe
                       ? 'bg-indigo-600 text-white rounded-tr-none'
-                      : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                      : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-tl-none border border-gray-100 dark:border-gray-600'
                       }`}>
                       <p>{msg.content}</p>
                       <div className={`text-[10px] mt-1 text-right ${isMe ? 'text-indigo-200' : 'text-gray-400'}`}>
@@ -236,8 +236,8 @@ const Chat = () => {
             </div>
 
             {/* Input Footer */}
-            <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-100 flex items-center gap-2">
-              <button type="button" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+            <form onSubmit={handleSendMessage} className="p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 flex items-center gap-2">
+              <button type="button" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
                 <Paperclip size={20} />
               </button>
               <input
@@ -245,7 +245,7 @@ const Chat = () => {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 bg-gray-50 border-0 rounded-full px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none"
+                className="flex-1 bg-gray-50 dark:bg-gray-700 border-0 rounded-full px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none text-gray-900 dark:text-white dark:placeholder-gray-400"
               />
               <button
                 type="submit"
@@ -257,12 +257,12 @@ const Chat = () => {
             </form>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50/30">
-            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4 text-gray-300">
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50/30 dark:bg-gray-900/30">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-2xl flex items-center justify-center mb-4 text-gray-300 dark:text-gray-500">
               <Send size={32} />
             </div>
-            <p className="font-medium text-gray-600">Select a conversation</p>
-            <p className="text-sm">Choose a chat from the sidebar to start messaging</p>
+            <p className="font-medium text-gray-600 dark:text-gray-400">Select a conversation</p>
+            <p className="text-sm dark:text-gray-500">Choose a chat from the sidebar to start messaging</p>
           </div>
         )}
       </div>
