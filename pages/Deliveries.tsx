@@ -75,14 +75,14 @@ const Deliveries = () => {
   return (
     <div className="space-y-6 relative">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Deliveries Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Deliveries Management</h1>
         <div className="flex gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
             <input
               type="text"
               placeholder="Search ID or Customer..."
-              className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg w-full text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900"
+              className="pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg w-full text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 dark:text-white dark:placeholder-gray-400"
             />
           </div>
           <div className="relative">
@@ -90,7 +90,7 @@ const Deliveries = () => {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-white border border-gray-200 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer text-gray-900"
+              className="pl-10 pr-8 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer text-gray-900 dark:text-white"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -110,11 +110,11 @@ const Deliveries = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <tr className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 <th className="p-4">ID</th>
                 <th className="p-4">Route</th>
                 <th className="p-4">Customer</th>
@@ -124,41 +124,41 @@ const Deliveries = () => {
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {loading ? (
                 <tr><td colSpan={7} className="p-8 text-center text-gray-500">Loading deliveries...</td></tr>
               ) : deliveries.length === 0 ? (
                 <tr><td colSpan={7} className="p-8 text-center text-gray-500">No deliveries found.</td></tr>
               ) : (
                 deliveries.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="p-4 font-medium text-gray-900">#{d.id}</td>
+                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td className="p-4 font-medium text-gray-900 dark:text-white">#{d.id}</td>
                     <td className="p-4">
                       <div className="flex flex-col gap-1 text-sm">
-                        <div className="flex items-center gap-1.5 text-gray-600">
+                        <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
                           <div className="w-2 h-2 rounded-full bg-green-500" />
                           <span className="truncate max-w-[150px]">{d.pickup_address}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-gray-600">
+                        <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
                           <div className="w-2 h-2 rounded-full bg-red-500" />
                           <span className="truncate max-w-[150px]">{d.dropoff_address}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-sm text-gray-700">{d.customer?.name || 'N/A'}</td>
+                    <td className="p-4 text-sm text-gray-700 dark:text-gray-300">{d.customer?.name || 'N/A'}</td>
                     <td className="p-4">
                       {d.driver ? (
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">
                             {d.driver.name.charAt(0)}
                           </div>
-                          <span className="text-sm text-gray-700">{d.driver.name}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{d.driver.name}</span>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400 italic">Unassigned</span>
                       )}
                     </td>
-                    <td className="p-4 text-sm font-medium text-gray-900">₦{(d.estimated_price || 0).toLocaleString()}</td>
+                    <td className="p-4 text-sm font-medium text-gray-900 dark:text-white">₦{(d.estimated_price || 0).toLocaleString()}</td>
                     <td className="p-4"><StatusBadge status={d.status} /></td>
                     <td className="p-4 text-right">
                       {d.status === 'pending' && (
@@ -170,7 +170,7 @@ const Deliveries = () => {
                         </button>
                       )}
                       {d.status !== 'pending' && (
-                        <button className="text-xs text-gray-500 hover:text-gray-900 px-3 py-1.5">
+                        <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-3 py-1.5">
                           Details
                         </button>
                       )}
@@ -186,12 +186,12 @@ const Deliveries = () => {
       {/* Assign Driver Modal */}
       {isAssignModalOpen && selectedDelivery && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-900">Assign Driver</h3>
-              <button onClick={() => setAssignModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Assign Driver</h3>
+              <button onClick={() => setAssignModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><X size={20} /></button>
             </div>
-            <div className="p-6 bg-gray-50 border-b border-gray-100">
+            <div className="p-6 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
               <p className="text-sm text-gray-500 mb-2">Delivery Route</p>
               <div className="flex items-start gap-3 mb-2">
                 <MapPin size={16} className="text-green-500 mt-0.5" />
