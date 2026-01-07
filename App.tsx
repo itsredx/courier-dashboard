@@ -220,23 +220,9 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
 
 
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
-  const location = useLocation();
-
   // Check real auth state from tokens
   if (!isAuthenticated()) {
     return <Navigate to="/" replace />;
-  }
-
-  // Check if user has a company
-  let user: any = {};
-  try {
-    user = JSON.parse(localStorage.getItem('user') || '{}');
-  } catch (e) {
-    console.error('Failed to read user from storage', e);
-  }
-
-  if (user.role === 'company_admin' && !user.company && location.pathname !== '/onboarding') {
-    return <Navigate to="/onboarding" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -260,12 +246,7 @@ const App = () => {
             <Route path="/" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/onboarding" element={
-              isAuthenticated() ? (
-                // If already has company, go to dashboard
-                safelyGetUser().company ?
-                  <Navigate to="/dashboard" replace /> :
-                  <Onboarding />
-              ) : <Navigate to="/" replace />
+              isAuthenticated() ? <Onboarding /> : <Navigate to="/" replace />
             } />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
