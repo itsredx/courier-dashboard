@@ -32,8 +32,13 @@ const Login = () => {
     setError('');
 
     try {
-      await login(formData.username, formData.password);
-      navigate('/dashboard', { replace: true });
+      const response = await login(formData.username, formData.password);
+      // Navigate based on onboarding status
+      if (response.show_onboarding) {
+        navigate('/onboarding', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (err) {
       console.error('Login failed:', err);
       // Determine error message

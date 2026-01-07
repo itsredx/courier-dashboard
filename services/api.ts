@@ -147,6 +147,7 @@ interface LoginResponse {
         access: string;
         refresh: string;
     };
+    show_onboarding: boolean;
 }
 
 export const createCompany = async (data: {
