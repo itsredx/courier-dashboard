@@ -6,20 +6,40 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
 // Token management
-const getAccessToken = (): string | null => localStorage.getItem('accessToken');
-const getRefreshToken = (): string | null => localStorage.getItem('refreshToken');
+const getAccessToken = (): string | null => {
+    try {
+        return localStorage.getItem('accessToken');
+    } catch (e) {
+        return null;
+    }
+};
+const getRefreshToken = (): string | null => {
+    try {
+        return localStorage.getItem('refreshToken');
+    } catch (e) {
+        return null;
+    }
+};
 
 const setTokens = (access: string, refresh: string): void => {
-    localStorage.setItem('accessToken', access);
-    localStorage.setItem('refreshToken', refresh);
-    localStorage.setItem('isAuthenticated', 'true');
+    try {
+        localStorage.setItem('accessToken', access);
+        localStorage.setItem('refreshToken', refresh);
+        localStorage.setItem('isAuthenticated', 'true');
+    } catch (e) {
+        console.error('Failed to save tokens:', e);
+    }
 };
 
 const clearTokens = (): void => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
+    try {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('user');
+    } catch (e) {
+        console.error('Failed to clear tokens:', e);
+    }
 };
 
 // Check if user is authenticated

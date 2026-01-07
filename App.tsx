@@ -161,7 +161,12 @@ const ThemeToggle = () => {
 };
 
 const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  let user: any = {};
+  try {
+    user = JSON.parse(localStorage.getItem('user') || '{}');
+  } catch (e) {
+    console.error('Failed to read user from storage', e);
+  }
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-6 h-16 flex items-center justify-between transition-colors">
@@ -223,13 +228,27 @@ const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
   }
 
   // Check if user has a company
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  let user: any = {};
+  try {
+    user = JSON.parse(localStorage.getItem('user') || '{}');
+  } catch (e) {
+    console.error('Failed to read user from storage', e);
+  }
 
   if (user.role === 'company_admin' && !user.company && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
 
   return <Layout>{children}</Layout>;
+};
+
+// Helper for safe storage access
+const safelyGetUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || '{}');
+  } catch (error) {
+    return {};
+  }
 };
 
 const App = () => {
@@ -243,7 +262,7 @@ const App = () => {
             <Route path="/onboarding" element={
               isAuthenticated() ? (
                 // If already has company, go to dashboard
-                JSON.parse(localStorage.getItem('user') || '{}').company ?
+                safelyGetUser().company ?
                   <Navigate to="/dashboard" replace /> :
                   <Onboarding />
               ) : <Navigate to="/" replace />
