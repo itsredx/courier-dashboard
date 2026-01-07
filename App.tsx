@@ -1,5 +1,5 @@
 import React, { useState, Component, ErrorInfo } from 'react';
-import { MemoryRouter, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, Users, Wallet, Settings, LifeBuoy, Menu, X, Bell, User as UserIcon, MessageSquare, AlertTriangle, LogOut, Sun, Moon } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Deliveries from './pages/Deliveries';
@@ -215,6 +215,8 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
 
 
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
+  const location = useLocation();
+
   // Check real auth state from tokens
   if (!isAuthenticated()) {
     return <Navigate to="/" replace />;
@@ -222,22 +224,8 @@ const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
 
   // Check if user has a company
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  // If user is company_admin but has no company, redirect to onboarding
-  // We check for company field or some other indicator.
-  // NOTE: The current login API might NOT return company if it's null.
-  // We assume if they hit a 403 on dashboard it's because of this, but here we can preemptively check if we have the info.
-  // For now, let's rely on the fact that we will update user object in onboarding.
-  // A robust check would require fetching profile, but we want to avoid blocking every nav.
 
-  // Logic:
-  // If we are NOT on /onboarding and user has no company, we MIGHT need to redirect.
-  // But ProtectedRoute handles all protected pages.
-  // We need to differentiate between "needs onboarding" and "is fully set up".
-
-  // Let's modify logic:
-  // If user.role === 'company_admin' && !user.company && window.location.pathname !== '/onboarding', redirect to /onboarding
-
-  if (user.role === 'company_admin' && !user.company && window.location.pathname !== '/onboarding') {
+  if (user.role === 'company_admin' && !user.company && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
 
@@ -248,7 +236,7 @@ const App = () => {
   return (
     <ThemeProvider>
       <ErrorBoundary>
-        <MemoryRouter>
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -269,7 +257,7 @@ const App = () => {
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
           </Routes>
-        </MemoryRouter>
+        </BrowserRouter>
       </ErrorBoundary>
     </ThemeProvider>
   );
