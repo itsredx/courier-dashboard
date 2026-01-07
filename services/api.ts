@@ -3,7 +3,7 @@
  * Handles all HTTP requests to the Logistics backend with JWT authentication
  */
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
 // Token management
 const getAccessToken = (): string | null => localStorage.getItem('accessToken');
